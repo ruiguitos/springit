@@ -34,13 +34,7 @@ public class SpringitApplication {
 
             System.out.println("We just inserted a link and a comment");
             System.out.println("We just inserted a link and a comment");
-//
-//            Link firstLink = linkRepository.findByTitle("Getting Started With Spring Boot 2");
-//            System.out.println(firstLink.getTitle());
 
         };
-
-
     }
-
 }
