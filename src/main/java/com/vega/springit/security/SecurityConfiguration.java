@@ -1,5 +1,6 @@
 package com.vega.springit.security;
 
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,17 +12,21 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
-    public SecurityConfiguration(UserDetailsServiceImpl userDetailsService){
+    public SecurityConfiguration(UserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http
                 .authorizeRequests()
+                    .requestMatchers(EndpointRequest.to("info")).permitAll()
+                    .requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ADMIN")
+                //if user is user == access is forbidden
+                //if user is admin == access is allowed
+                    .antMatchers("/actuator/").hasRole("ADMIN")
                     .antMatchers("/").permitAll()
                     .antMatchers("/link/submit").hasRole("USER")
                     .and()
