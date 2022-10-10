@@ -12,6 +12,7 @@ nav .nav-item {
 }
 
 button.nav-link {
+    text-transform: uppercase;
     background: #2D2A27;
     border:none;
     cursor: pointer;

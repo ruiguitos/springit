@@ -18,36 +18,28 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         this.userDetailsService = userDetailsService;
     }
 
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//        http
-//                .authorizeRequests()
-//                    .requestMatchers(EndpointRequest.to("info")).permitAll()
-//                    .requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ADMIN")
-//                //if user is user == access is forbidden
-//                //if user is admin == access is allowed
-//                    .antMatchers("/actuator/").hasRole("ADMIN")
-//                    .antMatchers("/").permitAll()
-//                    .antMatchers("/link/submit").hasRole("USER")
-//                    .and()
-//                .formLogin();
-//    }
-
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                    .requestMatchers(EndpointRequest.to("info")).permitAll()
-                    .requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ACTUATOR")
-                    .antMatchers("/actuator/").hasRole("ACTUATOR")
-                    .antMatchers("/link/submit").hasRole("USER")
-                    .antMatchers("/link/**").permitAll()
-                    .antMatchers("/").permitAll()
-                    .antMatchers("/h2-console/**").permitAll()
+                .requestMatchers(EndpointRequest.to("info")).permitAll()
+                .requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ACTUATOR")
+                .antMatchers("/actuator/").hasRole("ACTUATOR")
+                .antMatchers("/link/submit").hasRole("USER")
+                .antMatchers("/link/**").permitAll()
+                .antMatchers("/").permitAll()
+                .antMatchers("/vote/**").permitAll()
+                .antMatchers("/h2-console/**").permitAll()
                 .and()
                 .formLogin()
+                .loginPage("/login").permitAll()
+                .usernameParameter("email")
                 .and()
-                    .csrf().disable()
-                    .headers().frameOptions().disable();
+                .logout()
+                .and()
+                .rememberMe()
+                .and()
+                .csrf().disable()
+                .headers().frameOptions().disable();
     }
 
     @Override
