@@ -28,8 +28,11 @@
                 <span class="domain">(<a th:href="${link.url}" th:text="${link.getDomainName()}">therealdanvega.com</a>)</span>
             </p>
             <p class="tagline ">submitted
-                <time th:title="${link.getCreationDate()}" th:datetime="${link.getCreationDate()}" class="live-timestamp" th:text="${link.getPrettyTime()}">1 hour(s)</time> by
-                <a href="/" class="author" th:text="${link.createdBy}">therealdanvega</a>
+                <time class="live-timestamp" th:datetime="${link.getCreationDate()}"
+                      th:text="${link.getPrettyTime()}" th:title="${link.getCreationDate()}">1 hour(s)
+                </time>
+                by
+                <a class="author" href="/" th:text="${link.createdBy}">therealdanvega</a>
                 <span class="userattrs"></span>
             </p>
             <p><a target="_blank" th:href="${link.url}" th:text="${link.url}"></a></p>
