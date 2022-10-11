@@ -20,7 +20,8 @@ import java.util.List;
 
 @Entity
 @RequiredArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 @NoArgsConstructor
 public class Link extends Auditable {
@@ -40,7 +41,13 @@ public class Link extends Auditable {
     @OneToMany(mappedBy = "link")
     private List<Comment> comments = new ArrayList<>();
 
-    public void addComment(Comment comment){
+    @OneToMany(mappedBy = "link")
+    private List<Vote> votes = new ArrayList<>();
+
+    private int voteCount = 0;
+
+
+    public void addComment(Comment comment) {
         comments.add(comment);
     }
 
