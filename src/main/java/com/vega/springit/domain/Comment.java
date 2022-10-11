@@ -14,7 +14,7 @@ import java.util.Date;
 
 @Entity
 @Getter @Setter
-@ToString
+//@ToString
 @NoArgsConstructor
 public class Comment extends Auditable {
 

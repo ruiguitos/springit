@@ -1,6 +1,8 @@
 package com.vega.springit.controller;
 
+import com.vega.springit.domain.Comment;
 import com.vega.springit.domain.Link;
+import com.vega.springit.repository.CommentRepository;
 import com.vega.springit.repository.LinkRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +22,12 @@ public class LinkController {
 
     private static final Logger logger = LoggerFactory.getLogger(LinkController.class);
 
-    private final LinkRepository linkRepository;
+    private LinkRepository linkRepository;
+    private CommentRepository commentRepository;
 
-    public LinkController(LinkRepository linkRepository) {
+    public LinkController(LinkRepository linkRepository, CommentRepository commentRepository) {
         this.linkRepository = linkRepository;
+        this.commentRepository = commentRepository;
     }
 
     @GetMapping("/")
@@ -33,13 +37,17 @@ public class LinkController {
     }
 
     @GetMapping("/link/{id}")
-    public String read(@PathVariable Long id, Model model) {
+    public String read(@PathVariable Long id,Model model) {
         Optional<Link> link = linkRepository.findById(id);
-        if(link.isPresent()){
-            model.addAttribute("link", link.get());
+        if( link.isPresent() ) {
+            Link currentLink = link.get();
+            Comment comment = new Comment();
+            comment.setLink(currentLink);
+            model.addAttribute("comment",comment);
+            model.addAttribute("link",currentLink);
             model.addAttribute("success", model.containsAttribute("success"));
             return "link/view";
-        }else {
+        } else {
             return "redirect:/";
         }
     }
@@ -66,5 +74,18 @@ public class LinkController {
             return "redirect:/link/{id}";
         }
     }
+
+    @PostMapping("/link/comments")
+    public String addComment(@Valid Comment comment, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if( bindingResult.hasErrors() ) {
+            logger.info("Something went wrong.");
+        } else {
+            logger.info("New Comment Saved!");
+            commentRepository.save(comment);
+        }
+        return "redirect:/link/" + comment.getLink().getId();
+    }
+
+    //THE ADD FORM WILL ONLY SHOW IF YOU ARE SIGNED IN
 
 }
