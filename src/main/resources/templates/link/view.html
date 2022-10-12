@@ -116,7 +116,9 @@
                       th:text="${link.getPrettyTime()}" th:title="${link.getCreationDate()}">1 hour(s)
                 </time>
                 by
-                <a class="author" href="/" th:text="${link.createdBy}">therealdanvega</a>
+<!--                <a class="author" href="/" th:text="${link.createdBy}">therealdanvega</a>-->
+                <a class="author" th:href="@{'/u/' + ${link.getUser().getAlias()}}"
+                   th:text="${link.getUser().getAlias()}">therealdanvega</a>
                 <span class="userattrs"></span>
             </p>
             <p><a target="_blank" th:href="${link.url}" th:text="${link.url}"></a></p>
