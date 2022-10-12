@@ -4,23 +4,51 @@ import com.vega.springit.domain.User;
 import com.vega.springit.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
-//@Transactional
 public class UserService {
 
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder encoder;
+    private final RoleService roleService;
+    private MailService mailService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, RoleService roleService, MailService mailService) {
         this.userRepository = userRepository;
+        this.roleService = roleService;
+        this.mailService = mailService;
+        encoder = new BCryptPasswordEncoder();
     }
 
     public User register(User user) {
+        // take the password from the form and encode
+        String secret = "{bcrypt}" + encoder.encode(user.getPassword());
+        user.setPassword(secret);
+        // confirm password
+        user.setConfirmPassword(secret);
+
+        // assign a role to this user
+        user.addRole(roleService.findByName("ROLE_USER"));
+
+        // set an activation code
+        user.setActivationCode(UUID.randomUUID().toString());
+
+        // disable the user
+        user.setEnabled(false);
+        // save user
+        save(user);
+
+        // send the activation email
+        sendActivationEmail(user);
+
+        // return the user
         return user;
     }
 
@@ -28,19 +56,25 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    //@Service
     @Transactional
     public void saveUsers(User... users) {
-        //begin transaction
-        for (User user : users) {
+        for(User user : users) {
             logger.info("Saving User: " + user.getEmail());
             userRepository.save(user);
         }
     }
-//
-//    @Transactional(readOnly = true)
-//    public Optional<User> findbyId(Long id){
-//        return userRepository.findById(id);
-//    }
-//
+
+    public void sendActivationEmail(User user) {
+        mailService.sendActivationEmail(user);
+    }
+
+    public void sendWelcomeEmail(User user) {
+        mailService.sendWelcomeEmail(user);
+    }
+
+        //    14.10//    14.10//    14.10//    14.10//    14.10//    14.10//    14.10
+
+    public Optional<User> findByEmailAndActivationCode(String email, String activationCode) {
+        return userRepository.findByEmailAndActivationCode(email,activationCode);
+    }
 }

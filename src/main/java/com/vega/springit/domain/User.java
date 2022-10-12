@@ -1,5 +1,6 @@
 package com.vega.springit.domain;
 
+import com.vega.springit.domain.validator.PasswordsMatch;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,9 +14,11 @@ import java.util.stream.Collectors;
 
 @Entity
 @RequiredArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 @NoArgsConstructor
+@PasswordsMatch
 public class User implements UserDetails {
 
     @Id @GeneratedValue
@@ -25,8 +28,8 @@ public class User implements UserDetails {
     @Size(min = 8, max = 20)
     @Column(nullable = false, unique = true)
     private String email;
-    @NonNull
 
+    @NonNull
     @Column(length = 100)
     private String password;
 
@@ -37,8 +40,8 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
+            joinColumns = @JoinColumn(name = "user_id",referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id",referencedColumnName = "id")
     )
     private Set<Role> roles = new HashSet<>();
 
@@ -59,18 +62,14 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String alias;
 
+    @Transient
+    @NotEmpty(message = "Please enter Password Confirmation")
+    private String confirmPassword;
+
+    private String activationCode;
+
     public String getFullName(){
         return firstName + " " + lastName;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-//        for(Role role : roles){
-//            authorities.add(new SimpleGrantedAuthority(role.getName()));
-//        }
-//        return authorities;
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
     public void addRole(Role role) {
@@ -79,6 +78,11 @@ public class User implements UserDetails {
 
     public void addRoles(Set<Role> roles) {
         roles.forEach(this::addRole);
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
     @Override
@@ -99,10 +103,5 @@ public class User implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
     }
 }
