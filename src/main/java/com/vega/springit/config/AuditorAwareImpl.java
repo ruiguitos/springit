@@ -1,6 +1,5 @@
 package com.vega.springit.config;
 
-
 import com.vega.springit.domain.User;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,4 +16,3 @@ public class AuditorAwareImpl implements AuditorAware<String> {
         }
     }
 }
-
